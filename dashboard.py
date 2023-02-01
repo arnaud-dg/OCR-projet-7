@@ -22,7 +22,8 @@ import shap
 st.set_option('deprecation.showPyplotGlobalUse', False)
 st.set_page_config( 
     page_title="Pret a dépenser - Evaluation du risque de crédit",
-    page_icon="./Images/jauge.png" 
+    page_icon="./Images/jauge.png",
+    layout="wide" 
 )
 # Configuration de l'API
 # en local :
