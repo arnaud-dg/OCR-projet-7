@@ -17,14 +17,17 @@ import matplotlib.lines as mlines
 import seaborn as sns
 import shap
 
-# Paramétrage streamlit
+# Paramétrage de la page sur streamlit
 st.set_option('deprecation.showPyplotGlobalUse', False)
-st.set_page_config(page_title = "OC - P7 - Scoring Client", layout="wide")
+st.set_page_config( 
+    page_title="Pret a dépenser - Evaluation du risque de crédit",
+    page_icon="/Images/jauge.png" 
+)
 # Configuration de l'API
 # en local :
-API_url = "http://192.168.1.94:5000/"
+# API_url = "http://192.168.1.94:5000/"
 # en ligne :
-# API_url = "https://api-flask-ocr-projet-7.herokuapp.com/"
+API_url = "https://api-flask-ocr-projet-7.herokuapp.com/"
 # Initialisation de javascript pour l'affichage des SHAP values
 shap.initjs()
 
@@ -35,10 +38,16 @@ def st_shap(plot, height=None):
     components.html(shap_html, height=height)
 
 # Titre du Dashboard
-st.write("""
-# OCR - Projet n°7 - Implémentez un modèle de scoring
-Tableau de bord de prédiction et d'interprétation
-""")
+st.title("Pret a dépenser - Evaluation du risque de crédit") 
+st.subheader("Le rapport graphique qui vous permet d'expliquer au client notre décision vis-à-vis de sa demande de prêt. :moneybag:")
+# st.write("""
+# # OCR - Projet n°7 - Implémentez un modèle de scoring
+# Tableau de bord de prédiction et d'interprétation
+# """)
+
+# -----------------------------------------------------------------------------------------
+# -----------------------      Récupération des données      ------------------------------
+# -----------------------------------------------------------------------------------------
 
 # Récupération des données à travers l'API
 json_url_all = urlopen(API_url + "data")
@@ -95,9 +104,15 @@ for col in data_ref.columns:
     else:
         data_ref.loc["mode", col] = np.NaN
 
+# -----------------------------------------------------------------------------------------
+# -----------------------       Bandeau latéral gauche       ------------------------------
+# -----------------------------------------------------------------------------------------
+
 # In the sidebar allow to select a client in the list
-st.sidebar.header("Paramètres")
-client_id = st.sidebar.selectbox("Identification du client",
+st.sidebar.title("Informations sur le demandeur") 
+st.sidebar.image("/Images/pret_a_depenser.png", width=100) 
+st.sidebar.write("Saisissez l'identifiant client pour afficher le rapport.")
+client_id = st.sidebar.selectbox("Client Id:",
                                  client_list)
 
 # Store the index in the DataFrame for this client
