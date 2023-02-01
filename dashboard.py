@@ -95,14 +95,14 @@ data_plot_std = scale_min_max.fit_transform(data_plot)
 # génération du dataframe
 data_plot_final = pd.DataFrame(data_plot_std, columns=columns)
 
-# Create the reference data (mean, median, mode)
+# Ceréation des données de référence (moyenne, médiane, mode)
 Z = data_all[columns]
 data_ref = pd.DataFrame(index=Z.columns)
 data_ref["mean"] = Z.mean()
 data_ref["median"] = Z.median()
 data_ref["mode"] = Z.mode().iloc[0, :]
 data_ref = data_ref.transpose()
-# Remove values when not relevant
+# Retrait des valeurs non pertinentes
 for col in data_ref.columns:
     if col in col_one:
         data_ref.loc["median", col] = np.NaN
@@ -114,10 +114,11 @@ for col in data_ref.columns:
 # -----------------------------------------------------------------------------------------
 
 # In the sidebar allow to select a client in the list
+st.sidebar.image("./Images/pret_a_depenser.png", width=250)
 st.sidebar.title("Informations sur le demandeur") 
-st.sidebar.image("./Images/pret_a_depenser.png", width=100) 
-st.sidebar.write("Saisissez l'identifiant client pour afficher le rapport.")
-client_id = st.sidebar.selectbox("Client Id:",
+ 
+# st.sidebar.write("Saisissez l'identifiant client pour afficher le rapport.")
+client_id = st.sidebar.selectbox("Saisissez l'identifiant client pour afficher le rapport:",
                                  client_list)
 
 # Store the index in the DataFrame for this client
@@ -151,6 +152,23 @@ for col in columns:
             columns_categ.append(col)
         else:
             columns_quanti.append(col)
+
+# -----------------------------------------------------------------------------------------
+# -----------------------          Page principale           ------------------------------
+# -----------------------------------------------------------------------------------------
+
+
+col1, col2 = st.columns([1, 1])
+with col1: 
+    st.image("./Images/credit.png") 
+with col2: 
+    st.write("""To borrow money, credit analysis is performed. Credit analysis involves the measure 
+    to investigate the probability of the applicant to pay back the loan on time and predict its 
+    default/ failure to pay back. These challenges get more complicated as the count of applications 
+    increases that are reviewed by loan officers. Human approval requires extensive hours effort to 
+    review each application, however, the company will always seek cost optimization and improve 
+    human productivity. This sometimes causes human error and bias, as it’s not practical to digest 
+    a large number of applicants considering all the factors involved.""")
 
 # Once the client and columns are selected, run the process
 # display a message while processing...
