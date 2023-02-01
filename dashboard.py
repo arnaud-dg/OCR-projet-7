@@ -22,9 +22,9 @@ st.set_option('deprecation.showPyplotGlobalUse', False)
 st.set_page_config(page_title = "OC - P7 - Scoring Client", layout="wide")
 # Configuration de l'API
 # en local :
-# API_url = "http://192.168.1.94:5000/"
+API_url = "http://192.168.1.94:5000/"
 # en ligne :
-API_url = "https://api-flask-ocr-projet-7.herokuapp.com/"
+# API_url = "https://api-flask-ocr-projet-7.herokuapp.com/"
 # Initialisation de javascript pour l'affichage des SHAP values
 shap.initjs()
 
