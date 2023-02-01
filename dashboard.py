@@ -21,7 +21,7 @@ import shap
 st.set_option('deprecation.showPyplotGlobalUse', False)
 st.set_page_config( 
     page_title="Pret a dépenser - Evaluation du risque de crédit",
-    page_icon="/Images/jauge.png" 
+    page_icon="./Images/jauge.png" 
 )
 # Configuration de l'API
 # en local :
@@ -110,7 +110,7 @@ for col in data_ref.columns:
 
 # In the sidebar allow to select a client in the list
 st.sidebar.title("Informations sur le demandeur") 
-st.sidebar.image("/Images/pret_a_depenser.png", width=100) 
+st.sidebar.image("./Images/pret_a_depenser.png", width=100) 
 st.sidebar.write("Saisissez l'identifiant client pour afficher le rapport.")
 client_id = st.sidebar.selectbox("Client Id:",
                                  client_list)
