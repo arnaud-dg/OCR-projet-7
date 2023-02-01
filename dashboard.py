@@ -158,10 +158,10 @@ for col in columns:
 # -----------------------          Page principale           ------------------------------
 # -----------------------------------------------------------------------------------------
 
-
+# Commentaires et introduction
 col1, col2 = st.columns([1, 1])
 with col1: 
-    st.image("./Images/credit.png") 
+    st.image("./Images/credit.png", width=400) 
 with col2: 
     st.write("""To borrow money, credit analysis is performed. Credit analysis involves the measure 
     to investigate the probability of the applicant to pay back the loan on time and predict its 
@@ -171,48 +171,50 @@ with col2:
     human productivity. This sometimes causes human error and bias, as it’s not practical to digest 
     a large number of applicants considering all the factors involved.""")
 
-# Once the client and columns are selected, run the process
-# display a message while processing...
+# Affichage du rapport
 with st.spinner("Traitement en cours..."):
-    # Get the data for the selected client and the prediction from an API
+    # Récupération des données clients depuis l'API
     json_url_client = urlopen(API_url + "data/client/" + str(client_id))
     API_data_client = json.loads(json_url_client.read())
     df = pd.DataFrame(API_data_client)
 
-    # List the columns we don't need for the explanation
+    # Liste des colonnes inutiles
     columns_info = ["SK_ID_CURR", "expected", "prediction", "proba_1"]
     
-    # Store the columns names to use them in the shap plots
+    # Stockage des colonnes utilisées pour les SHAP values
     client_data = df.drop(columns = columns_info).iloc[0:1,:]
     features_analysis = client_data.columns
     
-    # store the data we want to explain in the shap plots
+    # Stockage des données requises pour les SHAP values
     data_explain = np.asarray(client_data)
     shap_values = df.drop(columns = columns_info).iloc[1,:].values
     expected_value = df["expected"][0]
     
-    # Display client score :
-    st.subheader("Scoring client :")    
-    col1, col2, col3 = st.columns(3)
-    if df["proba_1"][0]<0.45:
-        with col1:
-            st.success("Risque faible")
-    elif df["proba_1"][0]>0.55:
-        with col3:
-            st.error("Risque élevé")
-    else:
-        with col2:
-            st.warning("Risque modéré")
-    
-    # Display the client's scoring
+    # Affichage du score client
+    st.subheader("Scoring client (en %) :")    
+    # Affichage avec échelle visuelle du score client
     st.slider("", min_value=0,
               max_value=100, value=int(round(df["proba_1"][0],2)*100),
                   disabled=True)
+    # Affichage avec échelle visuelle du score client
+    col1, col2, col3 = st.columns(3)
+    if df["proba_1"][0]<0.45:
+        with col1:
+            st.success("Niveau de risque faible")
+    elif df["proba_1"][0]>0.55:
+        with col3:
+            st.error("Niveau de risque élevé")
+    else:
+        with col2:
+            st.warning("Niveau de risque modéré")
+
+# -----------------------------------------------------------------------------------------
+# -----------------------      Interprétation SHAP values     -----------------------------
+# -----------------------------------------------------------------------------------------
+
+    st.subheader("Interprétabilité des résultats :")
     
-    # Explain the scoring thanks to shap plots
-    st.subheader("Interprétation du scoring :")
-    
-    # display a shap force plot
+    # Affichage du SHAP force_plot pour le client
     fig_force = shap.force_plot(
         expected_value,
         shap_values,
@@ -221,9 +223,9 @@ with st.spinner("Traitement en cours..."):
     ) 
     st_shap(fig_force)
     
-    # in an expander, display the client's data and comparison with average
-    with st.expander("Ouvrir pour afficher l'analyse détaillée"):
-        # display a shap waterfall plot
+    # Dans un expander - Affichage du SHAP waterfall et du decision plot
+    with st.expander("Rapport détaillé"):
+        # Waterfall
         fig_water = shap.plots._waterfall.waterfall_legacy(
             expected_value,
             shap_values,
@@ -232,12 +234,17 @@ with st.spinner("Traitement en cours..."):
         )
         st.pyplot(fig_water)
         
-        # display a shap decision plot
+        # Decision plot
         fig_decision = shap.decision_plot(
             expected_value, 
             shap_values, 
             features_analysis)
         st.pyplot(fig_decision)
+
+
+# -----------------------------------------------------------------------------------------
+# -----------------------      Informations sur le client     -----------------------------
+# -----------------------------------------------------------------------------------------
         
     st.subheader("Caractéristiques du client :")
     
@@ -248,12 +255,12 @@ with st.spinner("Traitement en cours..."):
     # Set the style for average values markers
     meanpointprops = dict(markeredgecolor="black", markersize=8,
                               markerfacecolor="green", markeredgewidth=0.66)
-    # Build the boxplots for each feature
+    # Affichage d'un boxplot pour chaque donnée retenue
     sns.boxplot(
             data=data_plot_final[columns_quanti],
             orient="h",
             whis=3,
-            palette="muted",
+            palette="pastel",
             linewidth=0.7,
             width=0.6,
             showfliers=False,
@@ -264,35 +271,37 @@ with st.spinner("Traitement en cours..."):
             data=data_client[columns_quanti],
             orient="h",
             size=8,
-            palette="blend:firebrick,firebrick",
+            # palette="blend:firebrick,firebrick",
+            palette=["black", "seagreen"],
             marker="D",
             edgecolor="black",
             linewidth=0.66)
-    # Remove ticks labels for x
+    # RRtrait de l'axe x
     ax.set_xticklabels([])
-    # Manage y labels style
+    # Retrait des lignes des axes
+    sns.despine(trim=True, left=True, bottom=True, top=True)
+    # Retrait des gradations
+    plt.tick_params(left=False, bottom=False)
+    # Mise en forme de l'axe y
     ax.set_yticklabels(columns_quanti,
             fontdict={"fontsize": "medium",
                 "fontstyle": "italic",
                 "verticalalignment": "center",
                 "horizontalalignment": "right"})
-    # Remove axes lines
-    sns.despine(trim=True, left=True, bottom=True, top=True)
-    # Removes ticks for x and y
-    plt.tick_params(left=False, bottom=False)
-    # Add separation lines for y values
+    # Séparateurs pour les lignes y
     lines = [ax.axhline(y, color="grey", linestyle="solid", linewidth=0.7)
                             for y in np.arange(0.5, len(columns_quanti)-1, 1)]
+
     # Proxy artists to add a legend
-    average = mlines.Line2D([], [], color="green", marker="^",
+    average = mlines.Line2D([], [], color="black", marker="^",
                             linestyle="None", markeredgecolor="black",
                             markeredgewidth=0.66, markersize=8, label="moyenne")
-    current = mlines.Line2D([], [], color="firebrick", marker="D",
+    current = mlines.Line2D([], [], color="seagreen", marker="D",
                             linestyle="None", markeredgecolor="black",
                             markeredgewidth=0.66, markersize=8, label="client courant")
     ax.legend(handles=[average, current], bbox_to_anchor=(1, 1), fontsize="small")
-    plt.title("Informations quantitatives")
-    # Display the plot
+    plt.title("Positionnement du client dans la population")
+    # Affichage du graphique
     st.pyplot(f)
     
     # Then for categories
