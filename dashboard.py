@@ -253,8 +253,7 @@ with st.spinner("Traitement en cours..."):
     # Initialize the figure
     f, ax = plt.subplots(figsize=(7, 5))
     # Set the style for average values markers
-    meanpointprops = dict(markeredgecolor="black", markersize=8,
-                              markerfacecolor="green", markeredgewidth=0.66)
+    meanpointprops = dict(markeredgecolor="black", markersize=8, markerfacecolor="green", markeredgewidth=0.66)
     # Affichage d'un boxplot pour chaque donnée retenue
     sns.boxplot(
             data=data_plot_final[columns_quanti],
@@ -270,9 +269,9 @@ with st.spinner("Traitement en cours..."):
     sns.stripplot(
             data=data_client[columns_quanti],
             orient="h",
-            size=8,
+            size=4,
             # palette="blend:firebrick,firebrick",
-            palette=["black", "seagreen"],
+            palette=["seagreen", "black"],
             marker="D",
             edgecolor="black",
             linewidth=0.66)
@@ -293,11 +292,9 @@ with st.spinner("Traitement en cours..."):
                             for y in np.arange(0.5, len(columns_quanti)-1, 1)]
 
     # Proxy artists to add a legend
-    average = mlines.Line2D([], [], color="black", marker="^",
-                            linestyle="None", markeredgecolor="black",
+    average = mlines.Line2D([], [], color="black", marker="^", linestyle="None", markeredgecolor="black",
                             markeredgewidth=0.66, markersize=8, label="moyenne")
-    current = mlines.Line2D([], [], color="seagreen", marker="D",
-                            linestyle="None", markeredgecolor="black",
+    current = mlines.Line2D([], [], color="seagreen", marker="D", linestyle="None", markeredgecolor="black",
                             markeredgewidth=0.66, markersize=8, label="client courant")
     ax.legend(handles=[average, current], bbox_to_anchor=(1, 1), fontsize="small")
     plt.title("Positionnement du client dans la population")
