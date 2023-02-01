@@ -9,6 +9,7 @@ from urllib.request import urlopen
 import json
 import datetime
 import pandas as pd
+# from PIL import Image
 import numpy as np
 from sklearn.compose import ColumnTransformer
 from sklearn.preprocessing import MinMaxScaler
@@ -36,6 +37,10 @@ shap.initjs()
 def st_shap(plot, height=None):
     shap_html = f"<head>{shap.getjs()}</head><body>{plot.html()}</body>"
     components.html(shap_html, height=height)
+
+# logo_page =  Image.open("./Images/jauge.png")
+# logo_entreprise = Image.open("./Images/pret_a_depenser.png")
+# logo_credit = Image.open("./Images/credit.png")
 
 # Titre du Dashboard
 st.title("Pret a dépenser - Evaluation du risque de crédit") 
