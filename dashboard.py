@@ -119,9 +119,8 @@ client_idx=data_all[data_all["SK_ID_CURR"] == client_id].index
 # Filtre du dataset sur le client ID
 data_client=data_plot_final.loc[client_idx, :]
 
+st.markdown("\n")
 st.sidebar.write("Paramétrage des graphiques")
-# Paramétrage de l'affichage des SHAP values
-option_SHAP=st.sidebar.selectbox('Quel graphique d\'interprétabilité désirez-vous?',('Forme simple', 'En cascade', 'Linéaire'))
 
 # Affichage des colonnes concernées
 aff_par_defaut=['EXT_SOURCE_2',
@@ -208,50 +207,28 @@ with st.spinner("Traitement en cours..."):
     st.markdown("""---""")
 
 # -----------------------------------------------------------------------------------------
-# -----------------------      Interprétation SHAP values     -----------------------------
-# -----------------------------------------------------------------------------------------
-    
-    st.subheader("Interprétabilité des résultats - Rapport détaillé")
-    
-    if option_SHAP=='Forme simple':
-        # Affichage du SHAP force_plot pour le client
-        fig_force = shap.force_plot(expected_value, shap_values, data_explain, feature_names=features_analysis) 
-        st_shap(fig_force)
-    elif option_SHAP=='En cascade':
-        # Affichage du SHAP waterfall pour le client
-        fig_water = shap.plots._waterfall.waterfall_legacy(expected_value, shap_values, feature_names=features_analysis, max_display=10)
-        st.pyplot(fig_water)
-    else:
-        # Decision plot
-        fig_decision = shap.decision_plot(expected_value, shap_values, features_analysis)
-        st.pyplot(fig_decision)
-
-    st.markdown("""---""")
-
-# -----------------------------------------------------------------------------------------
 # -----------------------      Informations sur le client     -----------------------------
 # -----------------------------------------------------------------------------------------
 
     st.subheader("Caractéristiques du client :")
     
-    # Display plots that compare the current client within all the clients
-    # For quantitative features first
-    # Initialize the figure
+    # --------------------   Variables numériques  --------------------
+    # Initialisation de la figure et du style
     f, ax = plt.subplots(figsize=(7, 5))
-    # Set the style for average values markers
     meanpointprops = dict(markeredgecolor="black", markersize=8, markerfacecolor="green", markeredgewidth=0.66)
-    # Affichage d'un boxplot pour chaque donnée retenue
+
+    # Affichage d'un boxplot pour chaque donnée retenue - Utilisation du dataframe de tous les clients
     sns.boxplot(
             data=data_plot_final[columns_quanti],
             orient="h",
             whis=3,
-            palette="steelblue",
+            palette="Blues",
             linewidth=0.7,
             width=0.6,
             showfliers=False,
             showmeans=True,
             meanprops=meanpointprops)
-    # Add in a point to show current client
+    # Affichage de notre client spécifiquement et de la moyenne constatée
     sns.stripplot(
             data=data_client[columns_quanti],
             orient="h",
@@ -261,23 +238,15 @@ with st.spinner("Traitement en cours..."):
             marker="D",
             edgecolor="black",
             linewidth=0.66)
-    # RRtrait de l'axe x
+    # Retrait de l'axe x, des lignes d'axes, des graduations, et mise en forme de l'axe y
     ax.set_xticklabels([])
-    # Retrait des lignes des axes
     sns.despine(trim=True, left=True, bottom=True, top=True)
-    # Retrait des gradations
     plt.tick_params(left=False, bottom=False)
-    # Mise en forme de l'axe y
-    ax.set_yticklabels(columns_quanti,
-            fontdict={"fontsize": "medium",
-                "fontstyle": "italic",
-                "verticalalignment": "center",
-                "horizontalalignment": "right"})
-    # Séparateurs pour les lignes y
+    ax.set_yticklabels(columns_quanti, fontdict={"fontsize": "medium", "fontstyle": "italic", "verticalalignment": "center", "horizontalalignment": "right"})
     lines = [ax.axhline(y, color="grey", linestyle="solid", linewidth=0.7)
                             for y in np.arange(0.5, len(columns_quanti)-1, 1)]
 
-    # Proxy artists to add a legend
+    # Légende
     average = mlines.Line2D([], [], color="black", marker="^", linestyle="None", markeredgecolor="black",
                             markeredgewidth=0.66, markersize=8, label="moyenne")
     current = mlines.Line2D([], [], color="seagreen", marker="D", linestyle="None", markeredgecolor="black",
@@ -287,78 +256,37 @@ with st.spinner("Traitement en cours..."):
     # Affichage du graphique
     st.pyplot(f)
     
-    # Then for categories
-    # First ceate a summary dataframe
-    df_plot_cat = pd.DataFrame()
+    # --------------------   Variables catégorielles  --------------------
+    df_plot_cat=pd.DataFrame()
     for col in columns_categ:
-        df_plot_cat = pd.concat(
-            [
-                df_plot_cat,
-                pd.DataFrame(data_plot_final[col].value_counts()).transpose(),
-            ]
-        )
+        df_plot_cat=pd.concat([df_plot_cat, pd.DataFrame(data_plot_final[col].value_counts()).transpose()])
     df_plot_cat["categories"] = df_plot_cat.index
-    df_plot_cat = df_plot_cat[["categories", 0.0, 1.0]]
-    df_plot_cat = df_plot_cat.fillna(0)
-    # Then create the plot
+    df_plot_cat=df_plot_cat[["categories", 0.0, 1.0]]
+    df_plot_cat=df_plot_cat.fillna(0)
+
+    # Création de la figure
     with plt.style.context("_mpl-gallery-nogrid"):
-        # plot a Stacked Bar Chart using matplotlib
-        ax = df_plot_cat.plot(
-            x="categories",
-            kind="barh",
-            stacked=True,
-            mark_right=True,
-            grid=False,
-            xlabel="",
-            figsize=(6, 0.5 * len(columns_categ)),
-        )
-        # Display percentages of each value
-        df_total = df_plot_cat[0.0] + df_plot_cat[1.0]
-        df_rel = df_plot_cat[df_plot_cat.columns[1:]].div(df_total, 0) * 100
+        ax=df_plot_cat.plot(x="categories", kind="barh", stacked=True, mark_right=True, grid=False, xlabel="", figsize=(6, 0.5 * len(columns_categ)))
+        # Affcihage du pourcentage de chaque valeur
+        df_total=df_plot_cat[0.0] + df_plot_cat[1.0]
+        df_rel=df_plot_cat[df_plot_cat.columns[1:]].div(df_total, 0) * 100
         for n in df_rel:
             for i, (cs, ab, pc) in enumerate(
                 zip(df_plot_cat.iloc[:, 1:].cumsum(1)[n], df_plot_cat[n], df_rel[n])
             ):
-                plt.text(
-                    cs - ab / 2,
-                    i,
-                    str(np.round(pc, 1)) + "%",
-                    va="center",
-                    ha="center",
-                    color="white",
-                )
-        # Display markers for the current client
-        comparison = []
+                plt.text(cs - ab / 2, i, str(np.round(pc, 1)) + "%", va="center", ha="center", color="white")
+        # Affiche le pointeur pour le client actuel
+        comparison=[]
         for col in columns_categ:
-            total = len(data_plot_final[col])
-            client_val = int(data_client[col])
-            mask = data_plot_final[col] == client_val
-            temp = data_plot_final[mask]
-            count = temp[col].value_counts().values[0]
+            total=len(data_plot_final[col])
+            client_val=int(data_client[col])
+            mask=data_plot_final[col] == client_val
+            temp=data_plot_final[mask]
+            count=temp[col].value_counts().values[0]
             comparison.append(client_val * (total - count) + count / 2 + 15)
-        plt.plot(
-            comparison,
-            columns_categ,
-            marker="D",
-            color="firebrick",
-            markersize=8,
-            markeredgecolor="black",
-            linestyle="None",
-            markeredgewidth=0.66,
-        )
-        # Manage display
-        sns.despine(
-            trim=True,
-            left=True,
-            bottom=False,
-            top=True,
-        )
-        plt.legend(
-            ncols=1,
-            labels=["client courant", 0, 1],
-            bbox_to_anchor=(1, 1),
-            fontsize="small",
-        )
+        plt.plot(comparison, columns_categ, marker="D", color="firebrick", markersize=8, markeredgecolor="black", linestyle="None", markeredgewidth=0.66)
+        sns.despine(trim=True, left=True, bottom=False, top=True)
+        plt.legend(ncols=1, labels=["client courant", 0, 1], bbox_to_anchor=(1, 1), fontsize="small")
         ax.set_yticklabels(
             columns_categ,
             fontdict={
@@ -372,16 +300,41 @@ with st.spinner("Traitement en cours..."):
         plt.title("Informations catégorielles")
     st.pyplot()
     
-    # in an expander, display the client's data and comparison with average
-    with st.expander("Ouvrir pour afficher les données détaillées"):
-        temp_df = pd.concat([client_data, data_population])
-        new_df = temp_df.transpose()
-        new_df.columns = ["Client (" + str(client_id) + ")", "Moyenne",
-                          "Médiane", "Mode"]
-        st.table(new_df.loc[columns_selected,:])
+    # Tableau de données brutes
+    with st.expander("Consulter le tableau des données brutes"):
+        temp=pd.concat([client_data, data_population])
+        new=temp.transpose()
+        new.columns = ["Client (" + str(client_id) + ")", "Moyenne", "Médiane", "Mode"]
+        st.table(new.loc[columns_selected,:])
 
+    st.markdown("""---""")
+
+# -----------------------------------------------------------------------------------------
+# -----------------------      Interprétation SHAP values     -----------------------------
+# -----------------------------------------------------------------------------------------
+    
+    st.subheader("Interprétabilité des résultats - Rapport détaillé")
+    
+    # Paramétrage de l'affichage des SHAP values
+    option_SHAP=st.selectbox('Quel graphique d\'interprétabilité désirez-vous?',('Forme simple', 'En cascade', 'Linéaire'))
+    st.markdown("\n")
+
+    if option_SHAP=='Forme simple':
+        # Affichage du SHAP force_plot pour le client
+        fig_force = shap.force_plot(expected_value, shap_values, data_explain, feature_names=features_analysis) 
+        st_shap(fig_force)
+    elif option_SHAP=='En cascade':
+        # Affichage du SHAP waterfall pour le client
+        fig_water = shap.plots._waterfall.waterfall_legacy(expected_value, shap_values, feature_names=features_analysis, max_display=10)
+        st.pyplot(fig_water)
+    else:
+        # Affichage de la decision plot
+        fig_decision = shap.decision_plot(expected_value, shap_values, features_analysis)
+        st.pyplot(fig_decision)
+
+    st.markdown("""---""")
 # Display a success message in the sidebar once the process is completed
-with st.sidebar:
+with st:
     end = datetime.datetime.now()
     text_success = "Last successful run : " + str(end.strftime("%Y-%m-%d %H:%M:%S"))
     st.success(text_success)
