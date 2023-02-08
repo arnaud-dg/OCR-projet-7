@@ -22,7 +22,7 @@ from sklearn.preprocessing import MinMaxScaler
 import shap
 
 # Chargment des images intégrées à la page
-logo_page =  "./Images/jauge.png"
+logo_page =  "./Images/euro.png"
 logo_entreprise = "./Images/pret_a_depenser.png"
 logo_credit = "./Images/credit.png"
 
@@ -163,6 +163,8 @@ with col2:
     st.write("""2. Son positionnement par rapport à la population des clients de notre base de donnée""")
     st.write("""3. Les crtières qui dans son cas de figure conduisent à notre position""")
 
+st.markdown("""---""")
+
 # Affichage du rapport
 with st.spinner("Traitement en cours..."):
 
@@ -203,6 +205,8 @@ with st.spinner("Traitement en cours..."):
         with col2:
             st.warning("Niveau de risque modéré")
 
+    st.markdown("""---""")
+
 # -----------------------------------------------------------------------------------------
 # -----------------------      Interprétation SHAP values     -----------------------------
 # -----------------------------------------------------------------------------------------
@@ -222,6 +226,8 @@ with st.spinner("Traitement en cours..."):
         fig_decision = shap.decision_plot(expected_value, shap_values, features_analysis)
         st.pyplot(fig_decision)
 
+    st.markdown("""---""")
+
 # -----------------------------------------------------------------------------------------
 # -----------------------      Informations sur le client     -----------------------------
 # -----------------------------------------------------------------------------------------
@@ -239,7 +245,7 @@ with st.spinner("Traitement en cours..."):
             data=data_plot_final[columns_quanti],
             orient="h",
             whis=3,
-            palette="pastel",
+            palette="steelblue",
             linewidth=0.7,
             width=0.6,
             showfliers=False,
