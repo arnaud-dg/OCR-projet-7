@@ -84,6 +84,8 @@ columns=col_std + col_one
 
 # Mise en place du standardscaler pour transformer les données à travers le pipeline
 # Application du scaler
+# Set up the scaler to transform the data for the plots
+scale_min_max = ColumnTransformer(transformers=[("std", MinMaxScaler(), col_std),], remainder="passthrough")
 data_plot_std=scale_min_max.fit_transform(data_plot)
 # génération du dataframe
 data_plot_final=pd.DataFrame(data_plot_std, columns=columns)
