@@ -22,9 +22,9 @@ from sklearn.preprocessing import MinMaxScaler
 import shap
 
 # Chargment des images intégrées à la page
-logo_page =  Image.open("./Images/jauge.png")
-logo_entreprise = Image.open("./Images/pret_a_depenser.png")
-logo_credit = Image.open("./Images/credit.png")
+logo_page =  "./Images/jauge.png"
+logo_entreprise = "./Images/pret_a_depenser.png"
+logo_credit = "./Images/credit.png"
 
 # Paramétrage de la page sur streamlit
 st.set_option('deprecation.showPyplotGlobalUse', False)
