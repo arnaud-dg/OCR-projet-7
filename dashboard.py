@@ -119,9 +119,9 @@ client_idx=data_all[data_all["SK_ID_CURR"] == client_id].index
 # Filtre du dataset sur le client ID
 data_client=data_plot_final.loc[client_idx, :]
 
-st.write("Paramétrage des graphiques")
+st.sidebar.write("Paramétrage des graphiques")
 # Paramétrage de l'affichage des SHAP values
-option_SHAP=st.selectbox('Quel graphique d\'interprétabilité désirez-vous?',('Forme simple', 'En cascade', 'Linéaire'))
+option_SHAP=st.sidebar.selectbox('Quel graphique d\'interprétabilité désirez-vous?',('Forme simple', 'En cascade', 'Linéaire'))
 
 # Affichage des colonnes concernées
 aff_par_defaut=['EXT_SOURCE_2',
