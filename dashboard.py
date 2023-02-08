@@ -333,8 +333,9 @@ with st.spinner("Traitement en cours..."):
         st.pyplot(fig_decision)
 
     st.markdown("""---""")
+
 # Display a success message in the sidebar once the process is completed
-with st:
+with st.sidebar:
     end = datetime.datetime.now()
     text_success = "Last successful run : " + str(end.strftime("%Y-%m-%d %H:%M:%S"))
     st.success(text_success)
