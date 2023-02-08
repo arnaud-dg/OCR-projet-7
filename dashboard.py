@@ -22,7 +22,7 @@ from sklearn.preprocessing import MinMaxScaler
 import shap
 
 # Chargment des images intégrées à la page
-logo_page =  Image.open("./Images/euro.png")
+logo_page =  Image.open("./Images/jauge.png")
 logo_entreprise = Image.open("./Images/pret_a_depenser.png")
 logo_credit = Image.open("./Images/credit.png")
 
@@ -117,6 +117,10 @@ client_idx=data_all[data_all["SK_ID_CURR"] == client_id].index
 # Filtre du dataset sur le client ID
 data_client=data_plot_final.loc[client_idx, :]
 
+st.write("Paramétrage des graphiques")
+# Paramétrage de l'affichage des SHAP values
+option_SHAP=st.selectbox('Quel graphique d\'interprétabilité désirez-vous?',('Forme simple', 'En cascade', 'Linéaire'))
+
 # Affichage des colonnes concernées
 aff_par_defaut=['EXT_SOURCE_2',
          'EXT_SOURCE_3',
@@ -128,7 +132,7 @@ aff_par_defaut=['EXT_SOURCE_2',
          'DAYS_EMPLOYED',
          'CODE_GENDER',
          'DAYS_LAST_PHONE_CHANGE']
-columns_selected = st.sidebar.multiselect("Informations du client à afficher",columns, aff_par_defaut)
+columns_selected = st.sidebar.multiselect("Informations du client à afficher :",columns, aff_par_defaut)
 
 # Creation de listes pour les différentes colonnes saisies
 columns_categ = []
@@ -139,9 +143,6 @@ for col in columns:
             columns_categ.append(col)
         else:
             columns_quanti.append(col)
-
-# Paramétrage de l'affichage des SHAP values
-option_SHAP=st.selectbox('Quel graphique d\'interprétabilité désirez-vous?',('Forme simple', 'En cascade', 'Linéaire'))
 
 # -----------------------------------------------------------------------------------------
 # -----------------------          Page principale           ------------------------------
@@ -203,7 +204,6 @@ with st.spinner("Traitement en cours..."):
 # -----------------------------------------------------------------------------------------
 # -----------------------      Interprétation SHAP values     -----------------------------
 # -----------------------------------------------------------------------------------------
-
     
     st.subheader("Interprétabilité des résultats - Rapport détaillé")
     
@@ -220,11 +220,10 @@ with st.spinner("Traitement en cours..."):
         fig_decision = shap.decision_plot(expected_value, shap_values, features_analysis)
         st.pyplot(fig_decision)
 
-
 # -----------------------------------------------------------------------------------------
 # -----------------------      Informations sur le client     -----------------------------
 # -----------------------------------------------------------------------------------------
-        
+
     st.subheader("Caractéristiques du client :")
     
     # Display plots that compare the current client within all the clients
